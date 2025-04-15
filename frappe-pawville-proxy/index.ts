@@ -30,10 +30,12 @@ const proxy = createServer((req, res) => {
         res.setHeader(key, value);
 
       const textResponse = await response.text();
+      console.log(textResponse);
       try {
         const discordResponse = JSON.parse(textResponse);
         const convertedResponse = manipulateData(discordResponse);
         res.end(JSON.stringify(convertedResponse));
+        
       } catch {
         res.end(textResponse);
       }
