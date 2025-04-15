@@ -7,7 +7,7 @@ function manipulateData(discordResponse: any) {
   return {
     id: discordResponse.id,
     name: discordResponse.username,
-    email: `${discordResponse.username}@pawville.city`
+    email: `${discordResponse.id}@pawville.city`
   };
 }
 
