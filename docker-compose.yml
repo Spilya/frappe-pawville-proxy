@@ -1,0 +1,18 @@
+services:
+  ds-proxy:
+    networks:
+      - frappe_network
+    build:
+        context: ./frappe-pawville-proxy
+        dockerfile: ./Dockerfile
+    environment:
+      - PORT=6969
+  nginx:
+    image: nginx:latest
+    networks:
+      - frappe_network   
+
+      
+networks:
+  frappe_network:
+    driver: bridge

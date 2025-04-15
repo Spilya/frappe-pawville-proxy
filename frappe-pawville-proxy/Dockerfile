@@ -1,0 +1,7 @@
+FROM oven/bun:latest
+WORKDIR /app
+COPY ./ /app
+ENV PORT=6969
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+EXPOSE ${PORT}
+CMD ["bun", "start"]
