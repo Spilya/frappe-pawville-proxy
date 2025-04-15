@@ -3,13 +3,12 @@ import { createServer } from "http";
 const PORT = process.env.PORT || 8080;
 
 function manipulateData(discordResponse: any) {
-  const newObj = structuredClone(discordResponse);
-  if (!discordResponse) return newObj;
-
-  if (discordResponse.username) {
-    newObj.name = discordResponse.username;
-    newObj.email = `${discordResponse.username}@pawville.city`;
-  }
+  if (!discordResponse?.username) throw Error("Your JSON is shit");
+  return {
+    id: discordResponse.id,
+    name: discordResponse.username,
+    email: `${discordResponse.username}@pawville.city`
+  };
 }
 
 const proxy = createServer((req, res) => {
@@ -20,23 +19,28 @@ const proxy = createServer((req, res) => {
     try {
       const response = await fetch(`https://discord.com${req.url}`, {
         method: req.method,
-        headers: req.headers as any,
+        headers: {
+          ...req.headers as any,
+          "user-agent": "DiscordBot (python-requests, 2.32.3)",
+          "host": "discord.com"
+        },
         body
       });
 
       res.writeHead(response.status);
 
-      for (const [key, value] of response.headers.entries())
+      for (const [key, value] of response.headers.entries()) {
+        if (key !== "content-type") continue;
         res.setHeader(key, value);
+      }
 
       const textResponse = await response.text();
-      console.log(textResponse);
       try {
+        if (!req.url.endsWith("/users/@me")) throw Error("Not me");
         const discordResponse = JSON.parse(textResponse);
         const convertedResponse = manipulateData(discordResponse);
         res.end(JSON.stringify(convertedResponse));
-        
-      } catch {
+      } catch (error) {
         res.end(textResponse);
       }
     } catch (err) {
